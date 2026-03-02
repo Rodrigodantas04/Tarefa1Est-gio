@@ -10,25 +10,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    env:
-      # DB “fake” só para o Prisma não chorar se algum script precisar
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db?schema=public
-
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     steps:
       - uses: actions/checkout@v4
 
@@ -41,20 +22,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Prisma generate
-        run: npx prisma generate
-
-      - name: Prisma migrate (for tests)
-        run: npx prisma migrate deploy
-
-      - name: Build
-        run: npm run build
-
       - name: Lint
         run: npm run lint
 
       - name: Test
-        run: npm test -- --runInBand
+        run: npm test
 
-      - name: Docker build
+      - name: Build
+        run: npm run build
+
+      - name: Docker Build
         run: docker build -t task-api:ci .
