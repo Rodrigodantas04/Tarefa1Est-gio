@@ -10,12 +10,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     if (!connectionString) throw new Error('DATABASE_URL em falta no .env');
 
     const poolConfig: PoolConfig = { connectionString };
+    const pool: Pool = new Pool(poolConfig);
 
-    const pool = new Pool(poolConfig);
-
-    const adapter = new PrismaPg(
-      pool,
-    ) as unknown as Prisma.PrismaClientOptions['adapter'];
+    const adapter: Prisma.PrismaClientOptions['adapter'] = new PrismaPg(pool);
 
     super({ adapter });
   }
